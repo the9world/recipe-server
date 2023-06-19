@@ -227,6 +227,30 @@ class RecipeListResource(Resource): # class 클래스 이름(상속 받을 변�
 
 
 
+class UserRecipeResource(Resource): # 여기 막힘
+
+    def get(self, user_id):
+        # 2. 데이터베이스에 레시피 아이디로 쿼리한다.(recipe/1~x)
+        try :
+            connection = get_connection()
+            query = '''select r.*, u.username
+                        from recipe r
+                        join user u
+                            on r.user_id= u.id
+                        where recipe_id = %s and u.id=%s;'''
+            record= (user_id,) # 정수 하나면 ()라도 튜플이 아니고 그냥 정수니까 ","를 넣어준다.
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result_list= cursor.fetchall()
+            print(result_list)
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            print(e)
+            return {"result": "Fail", "error": str(e) }, 500
+
 
 
 
