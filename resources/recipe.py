@@ -85,7 +85,7 @@ class RecipePublishResource(Resource): # 레시피 공개 및 임시저장 Resou
             query='''update recipe
                         set is_publish=0
                     where id = %s and user_id = %s;'''
-            record = (recipe_id, user_id)        
+            record = (recipe_id, user_id)
             cursor = connection.cursor()
             cursor.execute(query, record)
             connection.commit()
@@ -140,6 +140,7 @@ class RecipeResource(Resource): # 경로가 다르면 새로운 클래스 Resour
         else :
             return {"result": "success", "item": result_list[0]}
 
+
     @jwt_required() # 뭔..블락 리스트에 넣어..야.. 뭐라.. 암튼 필수  
     def put(self, recipe_id):
         # 1. 클라이언트로부터 데이터를 받아온다.
@@ -176,8 +177,10 @@ class RecipeResource(Resource): # 경로가 다르면 새로운 클래스 Resour
         
         except Error as e :
             print(e)
-            return{"result":"success", "error": str(e)},500
+            return{"result":"fail", "error": str(e)},500
         return {"result":"success"}
+    
+    
     @jwt_required()
     def delete(self, recipe_id):
         # 1. 클라이언트로부터 데이터를 받아온다.
@@ -196,7 +199,7 @@ class RecipeResource(Resource): # 경로가 다르면 새로운 클래스 Resour
             connection.close()
         except Error as e:
             print(e)
-            return {"result":"success", "error":str(e)}
+            return {"result": "fail", "error": str(e)}
         # 3. 결과를 응답한다.
         
         return {"result":"succes"}

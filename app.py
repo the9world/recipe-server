@@ -18,7 +18,7 @@ jwt= JWTManager(app)
 
 # 로그아웃된 토큰으로 요청하는 경우!  이 경우는 비정상적인 경우 이므로
 # jwt가 알아서 처리하도록 코드작성 (함수는 정해져있다)
-@jwt.token_in_blocklist_loader
+@jwt.token_in_blocklist_loader # 유효하지 않은 블락리스트에 있는 토큰 관리하겠다.
 def check_if_token_is_revoked(jwt_header, jwt_payload):
     jti = jwt_payload['jti']
     return jti in jwt_blocklist
@@ -27,7 +27,7 @@ api = Api(app) # api 변수에 Flask를 넣음
 
 # 경로(URL의 path:포트뒤/path/쿼리앞)와 API동작코드(Resource)를 연결한다.
 api.add_resource(RecipeListResource, '/recipes')
-api.add_resource(RecipeResource, '/recipes/<int:recipe_id>') # recipes/숫자 들어오면 쉼표 앞을 실행
+api.add_resource(RecipeResource, '/recipes/<int:recipe_id>') # <int:memo_id> 인트인 메모아이디를 입력받음
 api.add_resource(UserRegisterResource, '/user/register') # 회원가입
 api.add_resource(UserLoginResource, '/user/login') # 로그인
 api.add_resource(UserLogoutResource, '/user/logout') # 로그아웃

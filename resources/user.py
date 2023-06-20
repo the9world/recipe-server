@@ -22,6 +22,7 @@ class UserLogoutResource(Resource):
         
         return{'result' : 'success'}
 
+
 class UserRegisterResource(Resource):
     
     def post(self):
@@ -93,7 +94,7 @@ class UserRegisterResource(Resource):
         return {'result': 'success', 'access_token' : access_token}
 
 
-    ### 로그인 관련 개발
+### 로그인 관련 개발
 class UserLoginResource(Resource):
     def post(self) :
     # {
