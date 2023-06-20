@@ -1,7 +1,7 @@
 from flask import Flask # from f:소문자, import F:대문자
 from flask_restful import Api # A 구분
 from config import Config 
-from resources.recipe import RecipeListResource, RecipeResource, UserRecipeResource
+from resources.recipe import MyRecipeListResource, RecipeListResource, RecipePublishResource, RecipeResource
 from resources.user import UserLoginResource, UserLogoutResource
 from resources.user import UserRegisterResource, jwt_blocklist
 from flask_jwt_extended import JWTManager
@@ -31,8 +31,8 @@ api.add_resource(RecipeResource, '/recipes/<int:recipe_id>') # recipes/숫자 �
 api.add_resource(UserRegisterResource, '/user/register') # 회원가입
 api.add_resource(UserLoginResource, '/user/login') # 로그인
 api.add_resource(UserLogoutResource, '/user/logout') # 로그아웃
-api.add_resource(UserRecipeResource, '/user/recipes')
-
+api.add_resource(RecipePublishResource, '/recipes/<int:recipe_id>/publish') # <int:recipe_id> 인트로 받겟다. flask 변수처리
+api.add_resource(MyRecipeListResource, '/recipes/me')
 
 # 클라이언트(PostMan)에게 요청 받고 
 # 요청 받은 URL이 '/recipes'가 맞다면 /recipes 경로로 넘어와서 앞에 RecipeListResource 실행

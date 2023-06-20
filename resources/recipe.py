@@ -16,6 +16,88 @@ from mysql_connection import get_connection
 # API를 만들기 위한 class는
 # flask_restful 라이브러리의 Resource class를 상속해서 생성.
 
+class MyRecipeListResource(Resource):
+    @jwt_required()
+    def get(self):    
+        user_id = get_jwt_identity()
+        
+        try:
+            connection= get_connection()
+            query= '''select *
+                    from recipe
+                    where user_id = %s'''
+            record= (user_id,)
+            
+            cursor= connection.cursor(dictionary=True) # 컬럼을 파이썬의 딕셔너리 형태로 가져오셈
+            cursor.execute(query, record)
+            
+            result_list= cursor.fetchall() # 결과를 리스트에 담아서 가져옴
+            cursor.close()
+            connection.close() # 수행완료
+                                
+        except Error as e:
+            print(e)
+            return {'result': 'Fail', 'error': str(e)}, 500
+        print(result_list)
+        
+        i=0
+        for row in result_list:
+            result_list[i]['created_at']= row['created_at'].isoformat()
+            result_list[i]['updated_at']= row['updated_at'].isoformat()
+            i = i+1 # i+=1
+        return {'result':'Success', 'count':len(result_list),
+                'items': result_list}
+    
+
+class RecipePublishResource(Resource): # 레시피 공개 및 임시저장 Resource
+    @jwt_required() # ID 암호화 관련
+    def put(self,recipe_id):
+        # 1. 클라이언트로 부터 데이터를 받아온다.
+        user_id= get_jwt_identity() # ID 암호화 관련(사용하기 위해선 def 위 required 필요.)
+        
+        # 2. DB 처리한다.
+        try:
+            connection= get_connection()
+            query='''update recipe
+                        set is_publish=1
+                    where id = %s and user_id = %s;'''
+            record = (recipe_id, user_id)        
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            connection.commit()
+            cursor.close()
+            connection.close()
+            
+        except Error as e :
+            print(e)
+            return{'result': 'fail', 'error': str(e)},500
+        
+        return {'result':'success'}
+    
+    @jwt_required() # ID 암호화 관련
+    def delete(self,recipe_id):
+    # 1. 클라이언트로 부터 데이터를 받아온다.
+        user_id= get_jwt_identity() # ID 암호화 관련(사용하기 위해선 def 위 required 필요.)
+        
+        # 2. DB 처리한다.
+        try:
+            connection= get_connection()
+            query='''update recipe
+                        set is_publish=0
+                    where id = %s and user_id = %s;'''
+            record = (recipe_id, user_id)        
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            connection.commit()
+            cursor.close()
+            connection.close()
+            
+        except Error as e :
+            print(e)
+            return{'result': 'fail', 'error': str(e)},500
+        
+        return {'result':'success'}
+    
 class RecipeResource(Resource): # 경로가 다르면 새로운 클래스 Resource는 flask 꺼
     # GET 메소드에서 경로로 넘어오는 변수는 get 함수의 파라미터로 사용
     def get(self, recipe_id): # recipe_id를 입력한다
@@ -224,32 +306,6 @@ class RecipeListResource(Resource): # class 클래스 이름(상속 받을 변�
                 'count' : 3,
                 'items' : result_list} # 200=정상=작성NO, 그외는 상태코드 리턴
 
-
-
-
-class UserRecipeResource(Resource): # 여기 막힘
-
-    def get(self, user_id):
-        # 2. 데이터베이스에 레시피 아이디로 쿼리한다.(recipe/1~x)
-        try :
-            connection = get_connection()
-            query = '''select r.*, u.username
-                        from recipe r
-                        join user u
-                            on r.user_id= u.id
-                        where recipe_id = %s and u.id=%s;'''
-            record= (user_id,) # 정수 하나면 ()라도 튜플이 아니고 그냥 정수니까 ","를 넣어준다.
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(query, record)
-            result_list= cursor.fetchall()
-            print(result_list)
-            
-            cursor.close()
-            connection.close()
-            
-        except Error as e:
-            print(e)
-            return {"result": "Fail", "error": str(e) }, 500
 
 
 
